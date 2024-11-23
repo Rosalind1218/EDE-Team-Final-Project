@@ -24,6 +24,23 @@ Stanislaus_Air_Files <- list.files(path = "./Data/Raw/Stanislaus_EPAair/",
 
 Stanislaus_Air_Data <- Stanislaus_Air_Files %>% 
   plyr::ldply(read.csv)
+
+#Load weather data
+
+install.packages("openmeteo") 
+library(openmeteo)
+
+weather_data <- weather_history(
+ location = c(36.000,-78.900), #change these coordinates
+ start = "2020-01-01", #change the dates
+ end = "2021-12-31",
+ hourly = "temperature_2m" 
+)
+ 
+ggplot(weather_data,aes(x=datetime,y=hourly_temperature_2m)) + 
+  geom_line()
+
+
 ```
 
 
