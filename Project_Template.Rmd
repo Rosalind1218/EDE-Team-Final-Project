@@ -1,3 +1,8 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
 \newpage
 \tableofcontents 
 \newpage
@@ -15,6 +20,7 @@ library(plyr)
 library(lubridate)
 library(trend)
 library(here)
+library(openmeteo)
 # Set your ggplot theme
 
 # Load your datasets
@@ -24,17 +30,77 @@ Stanislaus_Air_Files <- list.files(path = "./Data/Raw/Stanislaus_EPAair/",
 
 Stanislaus_Air_Data <- Stanislaus_Air_Files %>% 
   plyr::ldply(read.csv)
+ 
+weather_data <- weather_history(
+ location = c(36.000,-78.900),
+ start = "2020-01-01",
+ end = "2021-12-31",
+ hourly = "temperature_2m"
+)
+ 
+ggplot(weather_data,aes(x=datetime,y=hourly_temperature_2m)) + 
+  geom_line()
 ```
 
+```{r weatherdataprocess}
+# Ensure plyr is detached to avoid conflicts
+if ("package:plyr" %in% search()) {
+  detach("package:plyr", unload = TRUE)
+}
 
+# Ensure datetime is in proper format
+weather_data <- weather_data %>%
+  mutate(datetime = as.POSIXct(datetime, format = "%Y-%m-%d %H:%M:%S"))
+
+# Combine rows by month
+weather_data_processed <- weather_data %>%
+  mutate(month = format(as.Date(datetime), "%Y-%m")) %>% # Extract month as "YYYY-MM"
+  group_by(month) %>% 
+  summarise(
+    avg_temperature = mean(hourly_temperature_2m, na.rm = TRUE), 
+    max_temperature = max(hourly_temperature_2m, na.rm = TRUE), 
+    min_temperature = min(hourly_temperature_2m, na.rm = TRUE), 
+    total_records = dplyr::n() # Explicitly use n() from dplyr
+  )
+
+weather_data_processed
+```
 # Rationale and Research Questions
 
 
 
+
 \newpage
+```{r airqualityprocess}
+# Process the data: Combine rows by month
+Stanislaus_Air_Data_Processed <- Stanislaus_Air_Data %>%
+  mutate(
+    Date = as.Date(Date, format = "%m/%d/%Y"), 
+    month = format(Date, "%Y-%m")             
+  ) %>%
+  group_by(month) %>%                   
+  summarise(
+    avg_PM2_5 = mean(Daily.Mean.PM2.5.Concentration, na.rm = TRUE),  
+    max_PM2_5 = max(Daily.Mean.PM2.5.Concentration, na.rm = TRUE), 
+    min_PM2_5 = min(Daily.Mean.PM2.5.Concentration, na.rm = TRUE),  
+    total_records = n()                                             
+  )
+
+
+Stanislaus_Air_Data_Processed
+
+```
 
 # Dataset Information
+We are download two dataset, one from EPA Stanislaur_Air_Data to present the air 
+quality(include two values we want to examine PM2.5 and AQI values), another is 
+weather data from NOAA, we installed openmeteo” package to process data. Since 
+two datasets have different format of dates, we first use mutate function and group
+_by month to combine the rows for ensuring the consistency of "yyyy%-mm%" format. 
+However, each month has differnt numbers of observations, we then combine all the 
+rows happen in the same month so that we can easier to analyze the data. 
 
+weather_data to see how 
 
 
 \newpage
