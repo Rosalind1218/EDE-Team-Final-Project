@@ -157,10 +157,7 @@ ggplot(combined_data_long, aes(x = month_year_date, y = value, color = variable)
 
 ```
 ###Commentary
-```{r}
-#Looking at this graph, it appears that in the last decade, temperatures in Stanislaus County have followed a regular seasonal pattern. It does not show any type of trend year over year. On the other hand, PM2.5 shows a large spike between 2018-2019 and some other smaller spikes which appear to occur at somewhat regular intervals. 
-
-```
+Looking at this graph, it appears that in the last decade, temperatures in Stanislaus County have followed a regular seasonal pattern. It does not show any type of trend year over year. On the other hand, PM2.5 shows a large spike between 2018-2019 and some other smaller spikes which appear to occur at somewhat regular intervals. 
 
 ##How do PM2.5 concentrations vary over the course of a year? 
 
@@ -174,7 +171,11 @@ Stanislaus_Air_Data_Processed <- Stanislaus_Air_Data_Processed %>%
 
 #Plot PM2.5 levels by year
 
-ggplot(Stanislaus_Air_Data_Processed, aes(x = as.numeric(month), y = avg_PM25, color = year, group = year)) +
+ggplot(Stanislaus_Air_Data_Processed, 
+       aes(x = as.numeric(month), 
+           y = avg_PM25, 
+           color = year, 
+           group = year)) +
   geom_line() +
   scale_x_continuous(breaks = 1:12, labels = month.abb) +  # Show months as x-axis labels
   labs(
@@ -184,29 +185,27 @@ ggplot(Stanislaus_Air_Data_Processed, aes(x = as.numeric(month), y = avg_PM25, c
   ) +
   theme_minimal() +
   theme(
-    axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1),  #Angle labels for better readability
+    axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1), 
     legend.title = element_blank() 
   )
 ```
-```{r}
-#It looks like from 2013-2023, there is generally an increase in PM2.5 from July onwards, then it dips back down during teh winter months. 
+
+###Commentary
+
+It looks like from 2013-2023, there is generally an increase in PM2.5 from July onwards, then it dips back down during teh winter months. 
 
 
-#It is possible that there could be a seasonal component to particulate matter. We know that anthropogenic sources of PM 2.5 include combustion from motor vehicles, smelters, power plants, industrial facilities, residential fireplaces/wood stoves, agricultural burning, and forest fires. Thus, it is possible that in California, there could be higher PM 2.5 in the summer, when the risk of forest fires is higher and power plants are burning more fossil fuels to meet peak demand for air conditioning during hot summer months. 
-```
+It is possible that there could be a seasonal component to particulate matter. We know that anthropogenic sources of PM 2.5 include combustion from motor vehicles, smelters, power plants, industrial facilities, residential fireplaces/wood stoves, agricultural burning, and forest fires. Thus, it is possible that in California, there could be higher PM 2.5 in the summer, when the risk of forest fires is higher and power plants are burning more fossil fuels to meet peak demand for air conditioning during hot summer months. 
 
-
-
-## Question 1: Do concentrations of PM 2.5 correlate with temperature?
-
-## Question 2: 
 
 ##
 \newpage
 
 # Analysis
 
+## Question 1: Do concentrations of PM 2.5 correlate with temperature?
 
+## Question 2: 
 \newpage
 
 # Summary and Conclusions
