@@ -7,10 +7,8 @@
 
 ## Summary
 The purpose of this repository is to explore if certain weather variables impact air quality in Stanislaus County, CA. Poor air quality is a significant concern in this region, often exacerbated by local environmental 
-conditions and external influences such as wildfires and some industrial emissions. The primary focus is to identify patterns or correlations between weather conditions and changes in air quality metrics, such as AQI 
-(Air Quality Index) and PM2.5 concentrations. The goal of this project is to understand how specific weather variables, such as precipitation and temperature, impact air quality. This research will provide insights into 
+conditions and external influences such as wildfires and some industrial emissions. The primary focus is to identify patterns or correlations between weather conditions and changes in air quality metrics, such as PM2.5 concentrations. The goal of this project is to understand how specific weather variables, such as precipitation and temperature, impact air quality. This research will provide insights into 
 seasonal and weather-related factors contributing to air pollution, offering a some insight for future mitigation strategies, public health advisories, or policy recommendations.
-<describe the purpose of this repository, the information it contains, and any relevant analysis goals. What, why, where, when, how?>
 
 ## Investigators
 
