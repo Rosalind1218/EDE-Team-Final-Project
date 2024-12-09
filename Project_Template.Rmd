@@ -6,12 +6,11 @@ output:
 \newpage
 \tableofcontents 
 \newpage
-\listoftables 
-\newpage
 \listoffigures 
 \newpage
 
-```{r setup, include=FALSE}
+#Load Datasets for Air Quality and Weather
+```{r setup}
 # Set your working directory
 getwd()
 # Load your packages
@@ -20,8 +19,8 @@ library(plyr)
 library(lubridate)
 library(trend)
 library(here)
+#install.packages("openmeteo")
 library(openmeteo)
-# Set your ggplot theme
 
 # Load your datasets
 Stanislaus_Air_Files <- list.files(path = "./Data/Raw/Stanislaus_EPAair/",
@@ -33,36 +32,30 @@ Stanislaus_Air_Data <- Stanislaus_Air_Files %>%
 
 
 #Load weather data
-
-install.packages("openmeteo") 
-library(openmeteo)
-
 weather_data <- weather_history(
  location = c(37.6393,120.9970), #Coordinates for Modesto, CA
  start = "2013-01-01", 
  end = "2023-12-31",
  hourly = "temperature_2m" 
 )
-
-
 ```
 
 ```{r weatherdataprocess}
-# Ensure plyr is detached to avoid conflicts
+#Ensure plyr is detached to avoid conflicts
 if ("package:plyr" %in% search()) {
   detach("package:plyr", unload = TRUE)
 }
 
-# Ensure datetime is in proper format
+#Ensure datetime is in proper format
 weather_data <- weather_data %>%
   mutate(datetime = as.POSIXct(datetime, format = "%Y-%m-%d %H:%M:%S"))
 
-# Combine rows by month
+#Combine rows by month
 weather_data_processed <- weather_data %>%
   mutate(
-    month_year = format(as.Date(datetime), "%Y-%m"), 
+    year_month = format(as.Date(datetime), "%Y-%m"), 
   ) %>%
-  group_by(month_year) %>%
+  group_by(year_month) %>%
   summarise(
     avg_temperature = mean(hourly_temperature_2m, na.rm = TRUE), 
     max_temperature = max(hourly_temperature_2m, na.rm = TRUE), 
@@ -71,9 +64,7 @@ weather_data_processed <- weather_data %>%
   )
 ```
 # Rationale and Research Questions
-
-
-
+The primary focus is to identify patterns or correlations between weather conditions and changes in air quality metrics, such as AQI (Air Quality Index) and PM2.5 concentrations. The goal of this project is to understand how specific weather variables, such as precipitation and temperature, impact air quality. This research will provide insights into seasonal and weather-related factors contributing to air pollution, offering a some insight for future mitigation strategies, public health advisories, or policy recommendations.
 
 \newpage
 ```{r airqualityprocess}
@@ -81,9 +72,9 @@ weather_data_processed <- weather_data %>%
 Stanislaus_Air_Data_Processed <- Stanislaus_Air_Data %>%
   mutate(
     Date = as.Date(Date, format = "%m/%d/%Y"), 
-    month_year = format(Date, "%Y-%m")             
+    year_month = format(Date, "%Y-%m")             
   ) %>%
-  group_by(month_year) %>%                   
+  group_by(year_month) %>%                   
   summarise(
     avg_PM25 = mean(Daily.Mean.PM2.5.Concentration, na.rm = TRUE),  
     max_PM25 = max(Daily.Mean.PM2.5.Concentration, na.rm = TRUE), 
@@ -105,34 +96,30 @@ _by month to combine the rows for ensuring the consistency of "yyyy%-mm%" format
 However, each month has different numbers of observations, we then combine all the 
 rows happen in the same month so that we can easier to analyze the data. 
 
-
 \newpage
 
 # Exploratory Analysis 
 
-##Are there any noticeable trends in temperature or air pollution?
+## Are there any noticeable trends in temperature or air pollution?
 
 ```{r}
 #Explore data set
-class(weather_data_processed$month_year)
+class(weather_data_processed$year_month)
 
 #Create new column that is a date
 weather_data_processed <- weather_data_processed %>%
-  mutate(month_year_date = as.Date(paste0(month_year, "-01")))
+  mutate(month_year_date = as.Date(paste0(year_month, "-01")))
 
 Stanislaus_Air_Data_Processed<- Stanislaus_Air_Data_Processed %>%
-  mutate(month_year_date = as.Date(paste0(month_year, "-01")))
+  mutate(month_year_date = as.Date(paste0(year_month, "-01")))
 
 #Verify 
 str(weather_data_processed)
 str(Stanislaus_Air_Data_Processed)
-
-
 ```
 
-```{r}
+```{r, fig.height= 3, fig.width= 4, warning=FALSE, fig.cap="Monthly Trends of Temperature and PM2.5"}
 #Create a joined data frame with air and temperature data 
-
 combined_air_weather <- left_join(weather_data_processed, Stanislaus_Air_Data_Processed, by = "month_year_date")%>%
    slice(-1) #remove first column that contained NA values for Dec 2012
 
@@ -156,12 +143,12 @@ ggplot(combined_data_long, aes(x = month_year_date, y = value, color = variable)
 
 
 ```
-###Commentary
-Looking at this graph, it appears that in the last decade, temperatures in Stanislaus County have followed a regular seasonal pattern. It does not show any type of trend year over year. On the other hand, PM2.5 shows a large spike between 2018-2019 and some other smaller spikes which appear to occur at somewhat regular intervals. 
 
-##How do PM2.5 concentrations vary over the course of a year? 
+>Looking at this graph, it appears that in the last decade, temperatures in Stanislaus County have followed a regular seasonal pattern. It does not show any type of trend year over year. On the other hand, PM2.5 shows a large spike between 2018-2019 and some other smaller spikes which appear to occur at somewhat regular intervals. 
 
-```{r}
+## How do PM2.5 concentrations vary over the course of a year? 
+
+```{r, fig.height= 3, fig.width= 4, warning=FALSE, fig.cap="Monthly PM2.5 Concentrations 2013-2023"}
 #Create a new column with month and year
 Stanislaus_Air_Data_Processed <- Stanislaus_Air_Data_Processed %>%
   mutate(
@@ -179,7 +166,7 @@ ggplot(Stanislaus_Air_Data_Processed,
   geom_line() +
   scale_x_continuous(breaks = 1:12, labels = month.abb) +  # Show months as x-axis labels
   labs(
-    title = "Monthly PM2.5 Concentrations, From Years 2013-2023",
+    title = "Monthly PM2.5 Concentrations,2013-2023",
     x = "Month",
     y = "PM2.5 Concentrations (µg/m³)"
   ) +
@@ -190,23 +177,120 @@ ggplot(Stanislaus_Air_Data_Processed,
   )
 ```
 
-###Commentary
+>Summary: It looks like from 2013-2023, there is generally an increase in PM2.5 from July onwards, then it dips back down during the winter months. 
 
-It looks like from 2013-2023, there is generally an increase in PM2.5 from July onwards, then it dips back down during teh winter months. 
+>It is possible that there could be a seasonal component to particulate matter. We know that anthropogenic sources of PM 2.5 include combustion from motor vehicles, smelters, power plants, industrial facilities, residential fireplaces/wood stoves, agricultural burning, and forest fires. Thus, it is possible that in California, there could be higher PM 2.5 in the summer, when the risk of forest fires is higher and power plants are burning more fossil fuels to meet peak demand for air conditioning during hot summer months. 
 
-
-It is possible that there could be a seasonal component to particulate matter. We know that anthropogenic sources of PM 2.5 include combustion from motor vehicles, smelters, power plants, industrial facilities, residential fireplaces/wood stoves, agricultural burning, and forest fires. Thus, it is possible that in California, there could be higher PM 2.5 in the summer, when the risk of forest fires is higher and power plants are burning more fossil fuels to meet peak demand for air conditioning during hot summer months. 
-
-
-##
 \newpage
 
-# Analysis
+# Time Series Analysis
 
-## Question 1: Do concentrations of PM 2.5 correlate with temperature?
+```{r}
+#install.packages("trend")
+library(trend)
+#install.packages("zoo")
+library(zoo)
+#install.packages("Kendall")
+library(Kendall)
+#install.packages("tseries")
+library(tseries)
+```
 
-## Question 2: 
+
+## Do concentrations of average PM2.5 correlate over time from 2013-2023?
+```{r, fig.height= 3, fig.width= 4, warning=FALSE, fig.cap="Decomposed Air Quality Data"}
+#Generate time series
+f_month <- month(first(Stanislaus_Air_Data_Processed$month_year_date))
+f_year <- year(first(Stanislaus_Air_Data_Processed$month_year_date))
+
+Stanislaus_Air_Data_ts <- ts(Stanislaus_Air_Data_Processed$avg_PM25,
+                             start = c(f_year, f_month),
+                             frequency = 12)
+
+#Generate the Decomposition 
+Stanislaus_Air_Data_Decomposed <- stl(Stanislaus_Air_Data_ts, 
+                                      s.window = "periodic")
+
+#Visualize how the trend maps onto the data
+Stanislaus_Air_Data_components <- as.data.frame(
+  Stanislaus_Air_Data_Decomposed$time.series)
+
+#Visualize decomposed series
+plot(Stanislaus_Air_Data_Decomposed)
+```
+
+```{r, fig.height= 3, fig.width= 4, warning=FALSE, fig.cap="Average PM2.5 Concentrations 2013-2023"}
+#Run Seasonal Mann Kendall Test
+stanislaus_air_data_trend <- 
+  Kendall::SeasonalMannKendall(Stanislaus_Air_Data_ts)
+
+#Inspect Results
+stanislaus_air_data_trend
+summary(stanislaus_air_data_trend)
+
+#Visualization
+stanislaus_data_plot <- 
+  ggplot(Stanislaus_Air_Data_Processed, aes( x= month_year_date, 
+                                             y= avg_PM25)) +
+  geom_point() +
+  geom_line() +
+  ylab("Avg Pm2.5") +
+  xlab("2013-2023") +
+  geom_smooth(method = lm)
+print(stanislaus_data_plot)
+```
+
+>Kendall’s Tau and P-Value
+The Kendall's tau coefficient was calculated as -0.0182, which is very close to zero. This means there’s little to no consistent pattern in how the average PM 2.5 changes over time. There is no clear tendency for one to increase or decrease as the other changes.
+
+>The p-value was 0.78741, which is much higher than the typical threshold of 0.05. This means we didn’t find any statistically significant relationship between the avergae PM 2.5 over time To summarize, the analysis shows that the two variables don’t have a strong or consistent relationship in this dataset.
+
 \newpage
+
+# General Linear Model Analysis
+
+## What is the relationship between Average PM2.5 and Average Temperature 
+
+```{r, fig.height= 3, fig.width= 4, warning=FALSE, fig.cap="Average PM2.5 and Temperature 2013-2023"}
+#Test PM2.5 and Temperature in Regression Analysis 
+cor.test(combined_air_weather$avg_PM25, combined_air_weather$avg_temperature, 
+         method = "pearson")
+
+model <- lm(avg_PM25 ~ avg_temperature, data = combined_air_weather)
+summary(model)
+
+#Visualize
+stanislaus_data_plot1 <- 
+  ggplot(combined_air_weather, aes( x= avg_PM25, 
+                                             y= avg_temperature)) +
+  geom_point() +
+  geom_line() +
+  ylab("Avg Pm2.5") +
+  xlab("Temperature") +
+  geom_smooth(method = lm, color = "blue")
+print(stanislaus_data_plot1)
+```
+
+> Results of the Regression Analysis
+Performed an analysis to see if there's a relationship between average temperature and average PM2.5 levels in Stanislaus County.
+
+>Relationship Between Temperature and PM2.5:
+There is a negative relationship between temperature and PM2.5. This means that as the temperature increases, the PM2.5 levels tend to decrease. However, the effect is small, for each 1°C increase in temperature, PM2.5 drops by about 0.34 µg/m³.
+
+>Model Performance:
+The model does a fair job of showing the relationship, but it only explains about 17.5% of the variation in PM2.5 levels. This means that temperature is just one factor influencing PM2.5, and there are likely other important factors (like wind or pollution sources) that play a bigger role.
+
+>Significance:
+The relationship we found between temperature and PM2.5 is statistically significant, meaning it's unlikely to be due to random chance and that temperature does effect on PM2.5. However, temperature only explains a small part of the variation in air quality. Other factors like motor vehicles, smelters, power plants, industrial facilities, residential fireplaces/wood stoves, agricultural burning, and forest fires. 
+
+# Analysis of Variance
+
+## Using a Two-Way Anova Test are there correlations between Average PM2.5 and Temperature?
+```{r}
+
+```
+
+
 
 # Summary and Conclusions
 
