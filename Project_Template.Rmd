@@ -290,9 +290,6 @@ The relationship we found between temperature and PM2.5 is statistically signifi
 
 ## Using a One-Way Anova to test the correlation between temperature and PM2.5.
 ```{r}
-<<<<<<< HEAD
-Stanislaus_Air_Data_anova <- aov(data = 5, )
-=======
 #load package
 library(agricolae)
 
@@ -316,7 +313,6 @@ summary(anova)
 #Post-hoc test: Tukey HSD
 tukey = HSD.test(anova, "temp_category", group = TRUE)
 tukey
->>>>>>> bb83ccb2874f59e2d2acd0cd07a1fb0d81fb5321
 ```
 
 >Summary Based on One-way Anova and Post-hoc Test:
@@ -324,5 +320,16 @@ The analysis suggests a significant relationship between temperature categories 
 
 \newpage
 
-# References
-<add references here if relevant, otherwise delete this section> 
+# Saving Processed Datasets
+```{r}
+write.csv(
+  Stanislaus_Air_Data_Processed, 
+  file = here("./Data/Processed/Stanislaus_Air_Data_Processed"),
+  row.names = FALSE)
+
+write.csv(
+  weather_data_processed,
+  file = here("./Data/Processed/Weather_Data_Processed"),
+  row.names = FALSE)
+```
+
