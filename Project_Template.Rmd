@@ -288,15 +288,35 @@ The relationship we found between temperature and PM2.5 is statistically signifi
 
 # Analysis of Variance
 
-## Using a Two-Way Anova Test are there correlations between Average PM2.5 and Temperature?
+## Using a One-Way Anova to test the correlation between temperature and PM2.5.
 ```{r}
+#load package
+library(agricolae)
 
+#Get the quantile of average temperature 
+quantile = summary(combined_air_weather$avg_temperature)
+quantile
+
+#Divide temperatures into three categories：very low, low, median, high based on quantile
+combined_air_weather_groups = combined_air_weather %>%
+  mutate(
+    temp_category = cut(
+      avg_temperature,
+      breaks = c(-2.682, 3.723, 13.727, 22.014, 27.429),
+      labels = c("Very Low", "Low", "Medium", "High")
+      ))
+
+#Test PM2.5 and Temperature in one-way anova
+anova = aov(data = combined_air_weather_groups, avg_PM25 ~ temp_category)
+summary(anova)
+
+#Post-hoc test: Tukey HSD
+tukey = HSD.test(anova, "temp_category", group = TRUE)
+tukey
 ```
 
-
-
-# Summary and Conclusions
-
+>Summary Based on One-way Anova and Post-hoc Test:
+The analysis suggests a significant relationship between temperature categories and PM2.5 concentrations. PM2.5 levels are highest in the Very Low Temperature category and decrease as temperatures increase, with the High Temperature category having the lowest PM2.5 levels. This indicates that lower temperatures are associated with higher PM2.5 levels, likely due to reduced atmospheric dispersion and increased emissions from heating sources. However, no significant differences were observed among the Low, Medium, and High temperature categories. Further research is recommended to explore additional factors influencing PM2.5 levels, such as wind speed, humidity, and pollution sources.
 
 \newpage
 
