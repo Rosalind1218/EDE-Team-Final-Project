@@ -3,8 +3,8 @@ title: "Analyzing Seasonal Trends and Weather Impacts on AQI in Stanislaus, CA"
 author: "Ellie Harrigan, Rosalind Hu, Hanbin Lyu, Lauren Ng"
 date: "December 2024"
 output:
-  pdf_document: default
-  html_document: default
+  pdf_document:
+    latex_engine: xelatex
 ---
 \newpage
 \tableofcontents 
@@ -332,4 +332,3 @@ write.csv(
   file = here("./Data/Processed/Weather_Data_Processed"),
   row.names = FALSE)
 ```
-
