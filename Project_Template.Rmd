@@ -169,7 +169,7 @@ ggplot(Stanislaus_Air_Data_Processed,
   geom_line() +
   scale_x_continuous(breaks = 1:12, labels = month.abb) +  # Show months as x-axis labels
   labs(
-    title = "Monthly PM2.5 Concentrations,2013-2023",
+    title = "Monthly PM2.5 Concentrations, 2013-2023",
     x = "Month",
     y = "PM2.5 Concentrations (µg/m³)"
   ) +
@@ -290,7 +290,7 @@ The relationship we found between temperature and PM2.5 is statistically signifi
 
 ## Using a Two-Way Anova Test are there correlations between Average PM2.5 and Temperature?
 ```{r}
-
+Stanislaus_Air_Data_anova <- aov(data = 5, )
 ```
 
 
