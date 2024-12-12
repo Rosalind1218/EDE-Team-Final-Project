@@ -293,11 +293,11 @@ The relationship we found between temperature and PM2.5 is statistically signifi
 #load package
 library(agricolae)
 
-#Get the quantile of average temperature 
+#Get the quantile of the average temperatures 
 quantile = summary(combined_air_weather$avg_temperature)
 quantile
 
-#Divide temperatures into three categories：very low, low, median, high based on quantile
+#Divide temperatures into four categories：very low, low, median, high based on quantile
 combined_air_weather_groups = combined_air_weather %>%
   mutate(
     temp_category = cut(
