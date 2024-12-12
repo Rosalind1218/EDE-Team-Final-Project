@@ -1,0 +1,37 @@
+---
+title: "Ellie Edits"
+author: "Ellie Harrigan"
+date: "2024-11-21"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(plyr)
+library(lubridate)
+library(trend)
+library(here)
+```
+
+## Data Wrangling
+
+Uploaded the EPA air quality data for Stanislaus County, California into R,<https://www.epa.gov/outdoor-air-quality-data/download-daily-data>. Then combined the 10 csv files into one dataframe. 
+
+```{r cars}
+Stanislaus_Air_Files <- list.files(path = "./Data/Raw/Stanislaus_EPAair/",
+                                  pattern = "*.csv",
+                                  full.names = TRUE)
+
+Stanislaus_Air_Data <- Stanislaus_Air_Files %>% 
+  plyr::ldply(read.csv)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.

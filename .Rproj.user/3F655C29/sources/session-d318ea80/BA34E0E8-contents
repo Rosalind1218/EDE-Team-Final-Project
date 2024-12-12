@@ -1,10 +1,10 @@
 ---
 title: "Analyzing Seasonal Trends and Weather Impacts on AQI in Stanislaus, CA"
 author: "Ellie Harrigan, Rosalind Hu, Hanbin Lyu, Lauren Ng"
-date: "December 12 2024"
+date: "December 2024"
 output:
-  pdf_document:
-    latex_engine: xelatex
+  pdf_document: default
+  html_document: default
 ---
 \newpage
 \tableofcontents 
@@ -169,7 +169,7 @@ ggplot(Stanislaus_Air_Data_Processed,
   geom_line() +
   scale_x_continuous(breaks = 1:12, labels = month.abb) +  # Show months as x-axis labels
   labs(
-    title = "Monthly PM2.5 Concentrations, 2013-2023",
+    title = "Monthly PM2.5 Concentrations,2013-2023",
     x = "Month",
     y = "PM2.5 Concentrations (µg/m³)"
   ) +
@@ -288,47 +288,17 @@ The relationship we found between temperature and PM2.5 is statistically signifi
 
 # Analysis of Variance
 
-## Using a One-Way Anova to test the correlation between temperature and PM2.5.
+## Using a Two-Way Anova Test are there correlations between Average PM2.5 and Temperature?
 ```{r}
-#load package
-library(agricolae)
 
-#Get the quantile of the average temperatures 
-quantile = summary(combined_air_weather$avg_temperature)
-quantile
-
-#Divide temperatures into four categories：very low, low, median, high based on quantile
-combined_air_weather_groups = combined_air_weather %>%
-  mutate(
-    temp_category = cut(
-      avg_temperature,
-      breaks = c(-2.682, 3.723, 13.727, 22.014, 27.429),
-      labels = c("Very Low", "Low", "Medium", "High")
-      ))
-
-#Test PM2.5 and Temperature in one-way anova
-anova = aov(data = combined_air_weather_groups, avg_PM25 ~ temp_category)
-summary(anova)
-
-#Post-hoc test: Tukey HSD
-tukey = HSD.test(anova, "temp_category", group = TRUE)
-tukey
 ```
 
->Summary Based on One-way Anova and Post-hoc Test:
-The analysis suggests a significant relationship between temperature categories and PM2.5 concentrations. PM2.5 levels are highest in the Very Low Temperature category and decrease as temperatures increase, with the High Temperature category having the lowest PM2.5 levels. This indicates that lower temperatures are associated with higher PM2.5 levels, likely due to reduced atmospheric dispersion and increased emissions from heating sources. However, no significant differences were observed among the Low, Medium, and High temperature categories. Further research is recommended to explore additional factors influencing PM2.5 levels, such as wind speed, humidity, and pollution sources.
+
+
+# Summary and Conclusions
+
 
 \newpage
 
-# Saving Processed Datasets
-```{r}
-write.csv(
-  Stanislaus_Air_Data_Processed, 
-  file = here("./Data/Processed/Stanislaus_Air_Data_Processed"),
-  row.names = FALSE)
-
-write.csv(
-  weather_data_processed,
-  file = here("./Data/Processed/Weather_Data_Processed"),
-  row.names = FALSE)
-```
+# References
+<add references here if relevant, otherwise delete this section> 

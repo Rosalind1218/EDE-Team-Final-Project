@@ -1,7 +1,7 @@
 ---
 title: "Analyzing Seasonal Trends and Weather Impacts on AQI in Stanislaus, CA"
 author: "Ellie Harrigan, Rosalind Hu, Hanbin Lyu, Lauren Ng"
-date: "December 12 2024"
+date: "December 2024"
 output:
   pdf_document:
     latex_engine: xelatex
