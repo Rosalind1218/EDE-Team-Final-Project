@@ -3,7 +3,7 @@
     "path": "~/Team_Project/EDE Final Project/EDE_Group_Project.Rmd",
     "project_path": "EDE_Group_Project.Rmd",
     "type": "r_markdown",
-    "hash": "692809575",
+    "hash": "0",
     "contents": "",
     "dirty": false,
     "created": 1734030958930.0,
@@ -12,16 +12,16 @@
     "properties": {
         "source_window_id": "",
         "Source": "Source",
-        "cursorPosition": "333,3",
-        "scrollLine": "319",
+        "cursorPosition": "287,84",
+        "scrollLine": "0",
         "last_setup_crc32": ""
     },
     "folds": "",
-    "lastKnownWriteTime": 1734032690,
+    "lastKnownWriteTime": 1734038049,
     "encoding": "UTF-8",
     "collab_server": "",
     "source_window": "",
-    "last_content_update": 1734032690,
+    "last_content_update": 1734038049499,
     "read_only": false,
     "read_only_alternatives": []
 }

@@ -1,7 +1,7 @@
 ---
 title: "Analyzing Seasonal Trends and Weather Impacts on AQI in Stanislaus, CA"
 author: "Ellie Harrigan, Rosalind Hu, Hanbin Lyu, Lauren Ng"
-date: "December 12 2024"
+date: "December 12, 2024"
 output:
   pdf_document:
     latex_engine: xelatex
@@ -25,11 +25,11 @@ library(here)
 #install.packages("openmeteo")
 library(openmeteo)
 
-# Load your datasets
+#Load air datasets
 Stanislaus_Air_Files <- list.files(path = "./Data/Raw/Stanislaus_EPAair/",
                                   pattern = "*.csv",
                                   full.names = TRUE)
-
+#Combine air datasets 
 Stanislaus_Air_Data <- Stanislaus_Air_Files %>% 
   plyr::ldply(read.csv)
 
@@ -123,19 +123,23 @@ str(Stanislaus_Air_Data_Processed)
 
 ```{r, fig.height= 3, fig.width= 4, warning=FALSE, fig.cap="Monthly Trends of Temperature and PM2.5"}
 #Create a joined data frame with air and temperature data 
-combined_air_weather <- left_join(weather_data_processed, Stanislaus_Air_Data_Processed, by = "month_year_date")%>%
-   slice(-1) #remove first column that contained NA values for Dec 2012
+combined_air_weather <- left_join(weather_data_processed, Stanislaus_Air_Data_Processed, 
+                                  by = "month_year_date")%>%
+  slice(-1) #remove first column that contained NA values for Dec 2012
 
 combined_data_long <- combined_air_weather %>%
-  pivot_longer(cols = c(avg_temperature, avg_PM25), names_to = "variable", values_to = "value")
+  pivot_longer(cols = c(avg_temperature, avg_PM25), names_to = "variable", 
+               values_to = "value")
 
 #Create a faceted plot of average temperature and average PM2.5
-ggplot(combined_data_long, aes(x = month_year_date, y = value, color = variable)) +
+ggplot(combined_data_long, aes(x = month_year_date, y = value, 
+                               color = variable)) +
   geom_line(size = 1) +
   scale_x_date(date_breaks = "1 year", date_labels = "%Y")+  # Adjust interval
   facet_wrap(~ variable, scales = "free_y", ncol = 1, 
-            labeller = labeller(variable = c("avg_temperature" = "Average Temperature (°C)", 
-                                              "avg_pm25" = "Average PM2.5 (µg/m³)"))) +
+            labeller = labeller(variable = c
+                                ("avg_temperature" = "Average Temperature (°C)", 
+                                  "avg_pm25" = "Average PM2.5 (µg/m³)"))) +
   theme_minimal() +
   theme(
     axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1),
@@ -167,9 +171,9 @@ ggplot(Stanislaus_Air_Data_Processed,
            color = year, 
            group = year)) +
   geom_line() +
-  scale_x_continuous(breaks = 1:12, labels = month.abb) +  # Show months as x-axis labels
+  scale_x_continuous(breaks = 1:12, labels = month.abb) +  #Show months as x-axis labels
   labs(
-    title = "Monthly PM2.5 Concentrations, 2013-2023",
+    title = "Monthly PM2.5 Concentrations",
     x = "Month",
     y = "PM2.5 Concentrations (µg/m³)"
   ) +
@@ -281,7 +285,7 @@ Performed an analysis to see if there's a relationship between average temperatu
 There is a negative relationship between temperature and PM2.5. This means that as the temperature increases, the PM2.5 levels tend to decrease. However, the effect is small, for each 1°C increase in temperature, PM2.5 drops by about 0.34 µg/m³.
 
 >Model Performance:
-The model does a fair job of showing the relationship, but it only explains about 17.5% of the variation in PM2.5 levels. This means that temperature is just one factor influencing PM2.5, and there are likely other important factors (like wind or pollution sources) that play a bigger role.
+The model does a fair job of showing the relationship, but it only explains about 17% of the variation in PM2.5 levels. This means that temperature is just one factor influencing PM2.5, and there are likely other important factors (like wind or pollution sources) that play a bigger role.
 
 >Significance:
 The relationship we found between temperature and PM2.5 is statistically significant, meaning it's unlikely to be due to random chance and that temperature does effect on PM2.5. However, temperature only explains a small part of the variation in air quality. Other factors like motor vehicles, smelters, power plants, industrial facilities, residential fireplaces/wood stoves, agricultural burning, and forest fires. 
